@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Face Detection and Storage</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='main.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="wrapper">
+        <h2>Face Detection and Storage</h2>
+        <form
+          id="uploadForm"
+          action="/upload"
+          method="post"
+          enctype="multipart/form-data"
+          onsubmit="return validateForm()"
+        >
+          <label for="name">Full Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            placeholder="Enter Full Name Here"
+            pattern="^[A-Za-z\s]+$"
+            title="Name should only contain letters and spaces."
+            minlength="4"
+            maxlength="15"
+          />
+          <label for="designation">Designation</label>
+          <select id="designation" name="designation" required>
+            <option value="">Select Designation</option>
+            <option value="Web Developer">Web Developer</option>
+            <option value="App Developer">App Developer</option>
+            <option value="Machine Learning Engineer">Machine Learning Engineer</option>
+            <option value="Data Scientist">Data Scientist</option>
+            <option value="Project Manager">Project Manager</option>
+            <option value="Systems Analyst">Systems Analyst</option>
+            <option value="Network Administrator">Network Administrator</option>
+            <option value="Database Administrator">Database Administrator</option>
+            <option value="IT Support Specialist">IT Support Specialist</option>
+            <option value="Security Analyst">Security Analyst</option>
+            <option value="UI/UX Designer">UI/UX Designer</option>
+            <option value="QA Engineer">QA Engineer</option>
+            <option value="DevOps Engineer">DevOps Engineer</option>
+            <option value="Product Manager">Product Manager</option>
+            <option value="Software Engineer">Software Engineer</option>
+            <option value="Business Analyst">Business Analyst</option>
+            <option value="Marketing Specialist">Marketing Specialist</option>
+            <option value="HR Manager">HR Manager</option>
+          </select>
+          <label for="years_experience">Years of Experience</label>
+          <input
+            type="number"
+            id="years_experience"
+            name="years_experience"
+            min="0"
+            required
+            placeholder="Enter Years of Experience"
+          />
+          <label for="image">Upload Image</label>
+          <input
+            type="file"
+            id="image"
+            name="image"
+            accept="image/*"
+            required
+          />
+          <input type="submit" value="Upload" />
+        </form>
+        <div id="error-message" class="error-message"></div>
+        <div id="success-message" class="success-message"></div>
+      </div>
+    </div>
+    <script>
+      function validateForm() {
+        // Clear previous error messages
+        document.getElementById("error-message").innerText = "";
+        document.getElementById("success-message").innerText = "";
+
+        // Get form values
+        var name = document.getElementById("name").value.trim();
+        var designation = document.getElementById("designation").value.trim();
+        var image = document.getElementById("image").files[0];
+
+        // Regular expression for only letters and spaces
+        var regex = /^[A-Za-z\s]+$/;
+
+        try {
+          // Validate name
+          if (!regex.test(name) || name.length === 0 || name === " ") {
+            throw new Error(
+              "Please enter a valid full name. It should contain only letters and spaces, and cannot be a single space."
+            );
+          }
+
+          // Validate designation
+          if (designation.length === 0) {
+            throw new Error("Please select a valid designation.");
+          }
+
+          // Validate image
+          if (!image) {
+            throw new Error("Please upload an image.");
+          }
+          var allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+          if (!allowedTypes.includes(image.type)) {
+            throw new Error(
+              "Invalid file type. Please upload an image (JPEG or PNG)."
+            );
+          }
+        } catch (error) {
+          document.getElementById("error-message").innerText = error.message;
+          return false;
+        }
+
+        // Submit form using AJAX
+        var formData = new FormData(document.getElementById("uploadForm"));
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/upload", true);
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            document.getElementById("success-message").innerText =
+              "Upload successful!";
+            document.getElementById("uploadForm").reset();
+          } else {
+            document.getElementById("error-message").innerText =
+              xhr.responseText;
+          }
+        };
+        xhr.send(formData);
+
+        // Prevent default form submission
+        return false;
+      }
+    </script>
+  </body>
+</html>
